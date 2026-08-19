@@ -9,8 +9,8 @@ urlpatterns = [
         name="chamado-list-create",
     ),
     path(
-        "chamados/<int:pk>/",
-        ChamadoDetailView.as_view(),
-        name="chamado-detail",
-    ),
+    "chamados/<int:pk>/",  # ✅ CORRETO
+    ChamadoDetailView.as_view(),
+    name="chamado-detail",
+),
 ]
