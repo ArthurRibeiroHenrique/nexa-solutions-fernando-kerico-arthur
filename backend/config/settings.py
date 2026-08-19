@@ -1,12 +1,14 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-nexa-solutions-chave-exposta-nao-usar-em-producao"
+# INC-05: Lendo configurações sensíveis de variáveis de ambiente
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-dev")
 
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -53,11 +55,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Falha intencional: banco local SQLite.
+# INC-04: Banco de dados configurado para PostgreSQL via Docker
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "nexa_db"),
+        "USER": os.getenv("DB_USER", "postgres"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
+        "HOST": os.getenv("DB_HOST", "db"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
