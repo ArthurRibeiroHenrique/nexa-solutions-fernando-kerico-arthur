@@ -116,7 +116,12 @@
           </article>
         `).join("");
       } catch (erro) {
-        lista.innerHTML = "<p class='erro'>Não foi possível consultar a API.</p>";
+        lista.innerHTML = `
+          <p class="erro">Não foi possível consultar a API.</p>
+          <p class="erro"><strong>Tipo:</strong> ${erro.name}</p>
+          <p class="erro"><strong>Mensagem:</strong> ${erro.message}</p>
+          <pre class="erro"><strong>Stack:</strong> ${erro.stack}</pre>
+      `;
       }
     }
 
