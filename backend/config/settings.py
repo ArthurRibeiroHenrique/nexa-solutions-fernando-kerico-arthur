@@ -61,7 +61,7 @@ ASGI_APPLICATION = "config.asgi.application"
 # INC-04: Banco de dados configurado para PostgreSQL via Docker
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_NAME"),
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER", "postgres"),
         "PASSWORD": os.getenv("DB_PASSWORD"),

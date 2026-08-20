@@ -6,8 +6,7 @@ from .models import Chamado
 class ChamadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chamado
-
-        fields = [
+        fields = [  # noqa: RUF012
             "id",
             "titulo",
             "descricao",
@@ -15,17 +14,13 @@ class ChamadoSerializer(serializers.ModelSerializer):
             "criado_em",
             "atualizado_em",
         ]
-
-        # Falha intencional:
-        # A API aceita criação de chamados sem título.
-        extra_kwargs = {
-        "titulo": {
-            "required": True,
-            "allow_blank": False,
-        },
-    }
-        
-        read_only_fields = [
+        extra_kwargs = {  # noqa: RUF012
+            "titulo": {
+                "required": True,
+                "allow_blank": False,
+            },
+        }
+        read_only_fields = [  # noqa: RUF012
             "id",
             "criado_em",
             "atualizado_em",
