@@ -1,10 +1,13 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # INC-05: Lendo configurações sensíveis de variáveis de ambiente
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-dev")
+SECRET_KEY = os.getenv("SECRET_KEY", "arthurfernando")
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
@@ -58,12 +61,12 @@ ASGI_APPLICATION = "config.asgi.application"
 # INC-04: Banco de dados configurado para PostgreSQL via Docker
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "nexa_db"),
+        "ENGINE": os.getenv("DB_NAME"),
+        "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
-        "HOST": os.getenv("DB_HOST", "db"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
