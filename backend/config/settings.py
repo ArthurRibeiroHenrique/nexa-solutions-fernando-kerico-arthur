@@ -7,7 +7,9 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # INC-05: Lendo configurações sensíveis de variáveis de ambiente
-SECRET_KEY = os.getenv("SECRET_KEY", "arthurfernando")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY não está definida nas variáveis")
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
