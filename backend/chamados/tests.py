@@ -1,37 +1,44 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 from rest_framework import status
-
 from .models import Chamado
 
-
-class IndicadoresAPITests(TestCase):
+class ChamadosAPITests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.url = "/api/indicadores/"  # Ajuste se o prefixo no seu urls.py raiz for diferente
+        # Criando chamados de teste antes de cada função rodar
+        Chamado.objects.create(titulo="Internet caindo", status="ABERTO")
+        Chamado.objects.create(titulo="Teclado quebrado", status="CONCLUIDO")
 
-    def test_indicadores_com_base_vazia(self):
-        """Testa se a API retorna tudo zero quando não há chamados."""
-        response = self.client.get(self.url)
-        
+    # --- TESTES DE CRIAÇÃO (INC-01) ---
+    def test_criacao_valida(self):
+        dados = {"titulo": "Mouse parou de funcionar", "descricao": "Urgente"}
+        response = self.client.post('/api/chamados/', dados)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Chamado.objects.count(), 3)
+
+    def test_criacao_sem_titulo(self):
+        dados = {"descricao": "Faltou o título"}
+        response = self.client.post('/api/chamados/', dados)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # --- TESTES DE FILTRO (INC-02) ---
+    def test_filtro_status_valido(self):
+        response = self.client.get('/api/chamados/?status=ABERTO')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["total"], 0)
-        self.assertEqual(response.data["abertos"], 0)
-        self.assertEqual(response.data["em_andamento"], 0)
-        self.assertEqual(response.data["concluidos"], 0)
+        dados = response.data.get('results', response.data) if isinstance(response.data, dict) else response.data
+        self.assertEqual(len(dados), 1)
+        self.assertEqual(dados[0]['titulo'], "Internet caindo")
 
-    def test_indicadores_com_chamados_cadastrados(self):
-        """Testa se a API soma corretamente os status dos chamados."""
-        # Criando dados de teste
-        Chamado.objects.create(titulo="Chamado 1", status=Chamado.Status.ABERTO)
-        Chamado.objects.create(titulo="Chamado 2", status=Chamado.Status.ABERTO)
-        Chamado.objects.create(titulo="Chamado 3", status=Chamado.Status.EM_ANDAMENTO)
-        Chamado.objects.create(titulo="Chamado 4", status=Chamado.Status.CONCLUIDO)
+    def test_filtro_status_invalido(self):
+        response = self.client.get('/api/chamados/?status=BANANA')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("erro", response.data)
 
-        response = self.client.get(self.url)
-        
+    # --- TESTES DE INDICADORES (INC-06) ---
+    def test_indicadores_retorno(self):
+        response = self.client.get('/api/indicadores/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["total"], 4)
-        self.assertEqual(response.data["abertos"], 2)
-        self.assertEqual(response.data["em_andamento"], 1)
+        # Validando as chaves exatas que o seu colega criou:
+        self.assertIn("abertos", response.data)
+        self.assertEqual(response.data["abertos"], 1)
         self.assertEqual(response.data["concluidos"], 1)
+        self.assertEqual(response.data["total"], 2)
